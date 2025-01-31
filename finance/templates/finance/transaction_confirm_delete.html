@@ -1,0 +1,6 @@
+<h1> Tem certeza que deseja excluir esta transação?</h1>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sim, excluir</button>
+</form>
+<a href="{% url 'finance:transaction_list' %}">Cancelar</a>

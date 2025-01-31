@@ -9,12 +9,11 @@ class TransactionList(ListView):
     template_name = 'finance/transaction_list.html'
     context_object_name = 'transactions'
 
-
 class TransactionCreate(CreateView):
     model = Transaction
     fields = ['description', 'amount', 'category', 'date']
     template_name = 'finance/transaction_form.html'
-    success_url = reverse_lazy('finance:transaction_list')
+    success_url = '/finance/'
 
 class TransactionUpdate(UpdateView):
     model = Transaction
