@@ -1,16 +1,54 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">{% if form.instance.pk %}Editar{% else %}Criar{% endif %} Transação</h2>
+<div class="container d-flex justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4 text-center">
+            {% if form.instance.pk %}Editar{% else %}Criar{% endif %} Transação
+        </h2>
 
-    <form method="post" class="needs-validation" novalidate>
-        {% csrf_token %}
-        <div class="form-group">
-            {{ form.as_p }}
-        </div>
-        <button type="submit" class="btn btn-primary">Salvar</button>
-        <a href="{% url 'finance:transaction_list' %}" class="btn btn-secondary">Voltar</a>
-    </form>
+        <form method="post" class="needs-validation bg-light p-4 rounded shadow" novalidate style="max-width: 500px; margin: auto;">
+            {% csrf_token %}
+            <div class="form-group row">
+                <label for="{{ form.title.id_for_label }}" class="col-sm-3 col-form-label">Title:</label>
+                <div class="col-sm-9">
+                    {{ form.title }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="{{ form.description.id_for_label }}" class="col-sm-3 col-form-label">Description:</label>
+                <div class="col-sm-9">
+                    {{ form.description }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="{{ form.amount.id_for_label }}" class="col-sm-3 col-form-label">Amount:</label>
+                <div class="col-sm-9">
+                    {{ form.amount }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="{{ form.transaction_type.id_for_label }}" class="col-sm-3 col-form-label">Transaction Type:</label>
+                <div class="col-sm-9">
+                    {{ form.transaction_type }}
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label for="{{ form.date.id_for_label }}" class="col-sm-3 col-form-label">Date:</label>
+                <div class="col-sm-9">
+                    {{ form.date }}
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <a href="{% url 'finance:transaction_list' %}" class="btn btn-secondary">Voltar</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

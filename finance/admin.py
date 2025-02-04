@@ -6,8 +6,8 @@ from .models import Transaction
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'amount', 'transaction_type', 'category', 'date')
-    list_filter = ('transaction_type', 'category')
+    list_display = ('title', 'amount', 'transaction_type', 'date')
+    list_filter = ('transaction_type',)
     search_fields = ('title',)
 
 
