@@ -3,6 +3,7 @@ from django.db.models import Sum
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView
+from django.utils.dateparse import parse_date
 from .models import Transaction
 from django.urls import reverse_lazy
 import matplotlib.pyplot as plt
@@ -79,3 +80,25 @@ def transaction_chart(request):
 
     # Retorna a imagem gerada como resposta HTTP
     return HttpResponse(buffer.getvalue(), content_type='image/png')
+
+class TransactionListView(ListView):
+    model = Transaction
+    template_name = 'finance/transaction_list.html'
+    context_object_name = 'transactions'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        if start_date:
+            start_date = parse_date(start_date)
+            queryset = queryset.filter(date__gte=start_date)
+        
+        if end_date:
+            end_date = parse_date(end_date)
+            queryset = queryset.filter(date__lte=end_date)
+
+        return queryset
+
+        
