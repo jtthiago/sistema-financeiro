@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView
@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from django.http import HttpResponse
 from io import BytesIO
 import matplotlib
+
 
 matplotlib.use('Agg')
 
@@ -90,6 +91,7 @@ class TransactionListView(ListView):
         queryset = super().get_queryset()
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
+        search_query = self.request.GET.get('q')
 
         if start_date:
             start_date = parse_date(start_date)
@@ -98,6 +100,14 @@ class TransactionListView(ListView):
         if end_date:
             end_date = parse_date(end_date)
             queryset = queryset.filter(date__lte=end_date)
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |  
+                Q(description__icontains=search_query)
+            )
+
+    
 
         return queryset
 

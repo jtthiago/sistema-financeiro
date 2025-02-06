@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema Financeiro{% endblock %}</title>
+    <title>{% block title %}Controle Financeiro{% endblock %}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
+
         /* Estilos personalizados */
         body {
             background: linear-gradient(135deg,rgb(13, 13, 14), #2575fc); /* Gradiente moderno */
@@ -46,6 +49,8 @@
             color: #1a5bbf;
             
         }
+
+        
 
         .container {
             background: rgba(255, 255, 255, 0.9); /* Fundo branco semi-transparente */
@@ -91,12 +96,15 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand" href="{% url 'finance:transaction_list' %}"> Controle Financeiro</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            <button class="navbar-toggler bg-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
+                
                 <ul class="navbar-nav ms-auto">
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'finance:transaction_list' %}">Transações</a>
                     </li>
@@ -106,6 +114,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'finance:transaction_chart' %}">Gráficos</a>
                     </li>
+                    <form class="d-flex" method="get" action="{% url 'finance:transaction_list' %}">
+                        <input class="form-control me-2" type="search" name="q" placeholder="Buscar transação..." aria-label="Search">
+                        <button class="btn btn-outline-light bg-dark" type="submit">
+                            <i class="fas fa-search"></i> <!-- Ícone de lupa -->
+                        </button>
+                    </form>
                 </ul>
             </div>
         </div>
