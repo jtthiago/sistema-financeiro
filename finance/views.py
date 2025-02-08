@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, TemplateView
 from django.utils.dateparse import parse_date
 from .models import Transaction
 from django.urls import reverse_lazy
@@ -110,5 +110,30 @@ class TransactionListView(ListView):
     
 
         return queryset
+    
 
+class DashboardView(TemplateView):
+    template_name = "finance/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Alterado de "tipo" para "transaction_type"
+        receitas = Transaction.objects.filter(transaction_type='receita').aggregate(total=Sum('amount'))['total'] or 0
+        despesas = Transaction.objects.filter(transaction_type='despesa').aggregate(total=Sum('amount'))['total'] or 0
         
+        context['saldo_total'] = receitas - despesas
+        context['receitas'] = receitas
+        context['despesas'] = despesas
+
+        # Resumo mensal
+        resumo_mensal = (
+            Transaction.objects
+            .annotate(month=TruncMonth('date'))
+            .values('month')
+            .annotate(total=Sum('amount'))
+            .order_by('month')
+        )
+
+        context['resumo_mensal'] = resumo_mensal
+        return context

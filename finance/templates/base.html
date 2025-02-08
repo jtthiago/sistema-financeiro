@@ -33,7 +33,7 @@
                         <a class="nav-link" href="{% url 'finance:transaction_create' %}">Nova Transação</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'finance:transaction_chart' %}">Gráficos</a>
+                        <a class="nav-link" href="{% url 'finance:dashboard' %}">Dashboard</a>
                     </li>
                     <form class="d-flex" method="get" action="{% url 'finance:transaction_list' %}">
                         <input class="form-control me-2" type="search" name="q" placeholder="Buscar transação..." aria-label="Search">

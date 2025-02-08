@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Dashboard Financeiro</h2>
+
+    <div class="row text-center mt-4">
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Receitas</h5>
+                    <h3>R$ {{ receitas|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h5>Despesas</h5>
+                    <h3>R$ {{ despesas|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Saldo Total</h5>
+                    <h3>R$ {{ saldo_total|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h4>Resumo Mensal</h4>
+        <ul>
+            {% for item in resumo_mensal %}
+                <li>{{ item.month|date:"F Y" }}: R$ {{ item.total|floatformat:2 }}</li>
+            {% empty %}
+                <li>Nenhuma transação encontrada.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <a href="{% url 'finance:transaction_list' %}" class="btn btn-secondary mt-4">Voltar</a>
+</div>
+{% endblock %}
