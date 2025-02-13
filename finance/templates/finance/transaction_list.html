@@ -3,7 +3,6 @@
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Lista de Transações</h1>
-   
 
     {% if messages %}
         {% for message in messages %}
@@ -11,9 +10,8 @@
         {% endfor %}
     {% endif %}
 
-    
+    <!-- Filtros -->
     <div class="container mt-4">
-        
         <form method="get" class="d-flex align-items-center" style="max-width: 400px;">
             <input type="date" name="start_date" class="form-control me-2" style="width: 150px;" placeholder="Data Inicial">
             <input type="date" name="end_date" class="form-control me-2" style="width: 150px;" placeholder="Data Final">
@@ -25,6 +23,12 @@
     <div class="mb-4 text-center">
         <img src="{% url 'finance:transaction_chart' %}" alt="Gráfico de Transações" class="img-fluid">
     </div>
+
+    
+    
+    
+
+    
 
     <div class="table-responsive">
         <table class="table table-striped table-hover">
@@ -61,6 +65,25 @@
                 {% endfor %}
             </tbody>
         </table>
+
+    {% if is_paginated %}
+        <div class="pagination justify-content-center mt-4">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="page-link">&laquo; Primeira</a>
+                <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}" class="page-link">Anterior</a>
+            {% endif %}
+    
+            <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}" class="page-link">Próxima</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Última &raquo;</a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+        
     </div>
+
 </div>
 {% endblock %}

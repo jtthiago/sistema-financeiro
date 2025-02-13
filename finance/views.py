@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.paginator import Paginator
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
@@ -38,6 +39,8 @@ def transaction_delete(request, pk):
     transaction.delete()
     messages.success(request, "Transação excluída com sucesso!")
     return redirect('finance:transaction_list')
+
+
 
 
 def transaction_chart(request):
@@ -86,9 +89,11 @@ class TransactionListView(ListView):
     model = Transaction
     template_name = 'finance/transaction_list.html'
     context_object_name = 'transactions'
+    paginate_by = 10  # Adicionando paginação
+    ordering = ['-date']
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by('-date')  # Mantém a ordenação padrão
         start_date = self.request.GET.get('start_date')
         end_date = self.request.GET.get('end_date')
         search_query = self.request.GET.get('q')
@@ -107,9 +112,9 @@ class TransactionListView(ListView):
                 Q(description__icontains=search_query)
             )
 
-    
-
         return queryset
+
+
     
 
 class DashboardView(TemplateView):
@@ -118,17 +123,35 @@ class DashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Alterado de "tipo" para "transaction_type"
-        receitas = Transaction.objects.filter(transaction_type='receita').aggregate(total=Sum('amount'))['total'] or 0
-        despesas = Transaction.objects.filter(transaction_type='despesa').aggregate(total=Sum('amount'))['total'] or 0
-        
-        context['saldo_total'] = receitas - despesas
+        # Filtro de data
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        # Filtra as transações com base no tipo e data
+        transactions = Transaction.objects.all()
+
+        if start_date:
+            start_date = parse_date(start_date)
+            transactions = transactions.filter(date__gte=start_date)
+
+        if end_date:
+            end_date = parse_date(end_date)
+            transactions = transactions.filter(date__lte=end_date)
+
+        # Cálculo de receitas e despesas
+        receitas = transactions.filter(transaction_type='income').aggregate(total=Sum('amount'))['total'] or 0
+        despesas = transactions.filter(transaction_type='expense').aggregate(total=Sum('amount'))['total'] or 0
+
+        # Calcula o saldo total
+        saldo_total = receitas - despesas
+
+        context['saldo_total'] = saldo_total
         context['receitas'] = receitas
         context['despesas'] = despesas
 
         # Resumo mensal
         resumo_mensal = (
-            Transaction.objects
+            transactions
             .annotate(month=TruncMonth('date'))
             .values('month')
             .annotate(total=Sum('amount'))
@@ -136,4 +159,34 @@ class DashboardView(TemplateView):
         )
 
         context['resumo_mensal'] = resumo_mensal
+        return context
+    
+class ListaTransacoesView(ListView):
+    model = Transaction
+    template_name = 'finance/transaction_list.html'
+    context_object_name = 'transactions'
+    paginate_by = 10  # Define a paginação para 10 itens por página
+    ordering = ['-date']  # Ordena por data mais recente primeiro
+
+    def get_queryset(self):
+        queryset = super().get_queryset().order_by('-date')  # Mantém a ordenação
+        start_date = self.request.GET.get('start_date')
+        end_date = self.request.GET.get('end_date')
+
+        if start_date:
+            start_date = parse_date(start_date)
+            if start_date:
+                queryset = queryset.filter(date__gte=start_date)
+
+        if end_date:
+            end_date = parse_date(end_date)
+            if end_date:
+                queryset = queryset.filter(date__lte=end_date)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['start_date'] = self.request.GET.get('start_date', '')
+        context['end_date'] = self.request.GET.get('end_date', '')
         return context
