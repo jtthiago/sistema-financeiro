@@ -1,9 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.db.models import Sum, Q
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.utils.decorators import method_decorator
 from django.db.models.functions import TruncMonth
 from django.contrib import messages
-from django.views.generic import ListView, CreateView, UpdateView, TemplateView
+from django.views.generic import ListView, CreateView, UpdateView, TemplateView, DeleteView
 from django.utils.dateparse import parse_date
 from .models import Transaction
 from django.urls import reverse_lazy
@@ -34,12 +37,15 @@ class TransactionUpdate(UpdateView):
     template_name = 'finance/transaction_form.html'
     success_url = reverse_lazy('finance:transaction_list')
 
-def transaction_delete(request, pk):
-    transaction = get_object_or_404(Transaction, pk=pk)
-    transaction.delete()
-    messages.success(request, "Transação excluída com sucesso!")
-    return redirect('finance:transaction_list')
+class TransactionDeleteView(DeleteView):
+    model = Transaction
+    template_name = 'finance/transaction_confirm_delete.html'  # Crie esse template
+    success_url = reverse_lazy('finance:transaction_list')
 
+    def form_valid(self, form):
+        messages.success(self.request, "Transação excluída com sucesso!")
+        return super().form_valid(form)
+        
 
 
 
@@ -85,6 +91,8 @@ def transaction_chart(request):
     # Retorna a imagem gerada como resposta HTTP
     return HttpResponse(buffer.getvalue(), content_type='image/png')
 
+
+@method_decorator(login_required, name='dispatch')
 class TransactionListView(ListView):
     model = Transaction
     template_name = 'finance/transaction_list.html'

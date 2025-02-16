@@ -21,6 +21,7 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('finance/', include('finance.urls')),
+    path('accounts/', include('accounts.urls')),
 
     # Redireciona '/' para '/finance/'
     path('', lambda request: redirect('finance:transaction_list')),
